@@ -73,7 +73,7 @@ renderer.setAnimationLoop(time=>{
     desired.set(-Math.sin(h)*d+Math.cos(h)*.9,2.1-.25*pace+Math.min(shown.pitch,1.2)*.55,-Math.cos(h)*d-Math.sin(h)*.9);
     cameraOffset.lerp(desired,1-Math.exp(-9*dt));camera.position.set(shown.x,0,shown.z).add(cameraOffset);
     look.set(shown.x+Math.sin(h)*(shown.crashed?-.3:1.2),shown.crashed?.7:1.05,shown.z+Math.cos(h)*(shown.crashed?-.3:1.2));
-    const rideFov=(firstPerson&&!shown.crashed?Math.max(70,settings.fov):settings.fov)+10*pace;
+    const rideFov=(firstPerson&&!shown.crashed?Math.max(model.spec.scooter?80:70,settings.fov):settings.fov)+10*pace;
     camera.fov+=(rideFov-camera.fov)*(1-Math.exp(-4*dt));
     hudTime-=dt;
     if(hudTime<=0){hudTime=.1;
@@ -95,9 +95,10 @@ renderer.setAnimationLoop(time=>{
   camera.near=cockpit?.035:.1;
   if(cockpit){
     model.eyes.getWorldPosition(camera.position);
+    if(model.spec.scooter){camera.position.x-=Math.sin(shown.heading)*.12;camera.position.z-=Math.cos(shown.heading)*.12;}
     // Eye position follows the animated rider; keep the horizon readable while balancing.
     camera.position.y=Math.max(.45,camera.position.y);
-    look.set(camera.position.x+Math.sin(shown.heading)*12,camera.position.y-6+Math.min(shown.pitch,1.5)*3,camera.position.z+Math.cos(shown.heading)*12);
+    look.set(camera.position.x+Math.sin(shown.heading)*12,camera.position.y-(model.spec.scooter?7.5:6)+Math.min(shown.pitch,1.5)*3,camera.position.z+Math.cos(shown.heading)*12);
   }
   const cameraText=cockpit?'1. persoona':'3. persoona';
   if(cameraLabel.textContent!==cameraText)cameraLabel.textContent=cameraText;
