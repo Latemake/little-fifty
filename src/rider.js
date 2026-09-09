@@ -12,14 +12,30 @@ export function createRider(parent,spec,h){
  const head=new T.Group();head.position.set(0,.68,.025);body.add(head);
  head.name='rider-head';
  const eyes=new T.Object3D();eyes.name='rider-eyes';eyes.position.set(0,.035,.08);head.add(eyes);
- sphere(head,[.188,.208,.215],[0,0,0],white);
- sphere(head,[.148,.073,.07],[0,.014,.177],skin);
- box(head,[.31,.11,.075],[0,.035,.20],dark,.035);
- const lens=box(head,[.26,.066,.018],[0,.035,.244],0x608491,.022);lens.material=material(0x608491,.65,.18);
- box(head,[.13,.011,.01],[-.045,.051,.257],0xc4e5dd,.003);
- for(const side of [-1,1]){const cheek=box(head,[.06,.12,.17],[side*.135,-.095,.12],white,.026);cheek.rotation.x=.25;}
- box(head,[.255,.065,.14],[0,-.14,.19],white,.025);box(head,[.135,.025,.012],[0,-.14,.268],dark,.004);
- const peak=box(head,[.39,.025,.27],[0,.165,.16],white,.016);peak.rotation.x=-.12;
+ sphere(head,[.175,.211,.195],[0,0,-.025],white);
+ // A shaped face sits inside the helmet opening, behind clear riding goggles.
+ sphere(head,[.123,.151,.078],[0,-.008,.163],skin);
+ sphere(head,[.083,.062,.055],[0,-.105,.181],skin);
+ for(const side of [-1,1]){
+  sphere(head,[.048,.04,.029],[side*.068,-.033,.221],0xd69b7a);
+  sphere(head,[.035,.016,.014],[side*.051,.027,.237],0xf5eee2);
+  sphere(head,[.012,.013,.006],[side*.050,.027,.250],0x526d63);
+  sphere(head,[.0055,.008,.003],[side*.050,.027,.256],0x172326);
+  sphere(head,[.0025,.003,.002],[side*.047,.031,.259],0xffffff);
+  const brow=box(head,[.066,.012,.012],[side*.053,.056,.240],0x573d30,.004);brow.rotation.z=side*.08;
+  box(head,[.018,.089,.029],[side*.116,.028,.223],dark,.007);
+  box(head,[.027,.04,.17],[side*.171,.025,.02],dark,.008);
+ }
+ sphere(head,[.019,.038,.026],[0,-.006,.25],skin);
+ sphere(head,[.025,.016,.020],[0,-.032,.266],0xd79c7b);
+ box(head,[.056,.009,.010],[0,-.075,.237],0x92574d,.004);
+ box(head,[.046,.007,.008],[0,-.085,.236],0xe3ab8a,.003);
+ for(const y of [-.014,.074])box(head,[.239,.014,.025],[0,y,.236],dark,.006);
+ const lens=box(head,[.216,.073,.009],[0,.030,.273],0xc3e2dc,.012);
+ lens.material=material(0xc3e2dc,0,.16);lens.material.transparent=true;lens.material.opacity=.14;lens.material.depthWrite=false;
+ for(const side of [-1,1]){const cheek=box(head,[.047,.105,.15],[side*.139,-.102,.115],white,.018);cheek.rotation.x=.25;}
+ box(head,[.235,.043,.12],[0,-.163,.18],white,.018);box(head,[.115,.017,.012],[0,-.163,.245],dark,.004);
+ const peak=box(head,[.34,.021,.24],[0,.17,.145],white,.012);peak.rotation.x=-.12;
  box(head,[.12,.015,.11],[0,.204,-.035],dark,.005);
  const arms=[],legs=[];
  for(const side of [-1,1]){

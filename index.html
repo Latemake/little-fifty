@@ -13,6 +13,7 @@
     <section id="settings-panel" class="panel sub-panel" hidden>
       <button class="back" data-panel="home">← TAKAISIN</button><div class="eyebrow orange">TEE AJOSTA OMANLAISESI</div><h2>ASETUKSET<span>.</span></h2>
       <div class="settings-list">
+        <label>Äänenvoimakkuus <output id="volume-value"></output><input id="volume" type="range" min="0" max="1" step="0.05"></label>
         <label>Grafiikka<select id="quality"><option value="high">Korkea</option><option value="low">Kevyt</option></select></label>
         <label>Näkökenttä <output id="fov-value"></output><input id="fov" type="range" min="50" max="80" step="1"></label>
         <label>Kameran etäisyys <output id="distance-value"></output><input id="distance" type="range" min="4" max="7" step="0.1"></label>

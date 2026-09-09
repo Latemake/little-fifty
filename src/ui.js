@@ -1,6 +1,6 @@
 ﻿import {BIKES,getBike,loadBikeId} from './catalog.js';
-const defaults={quality:'high',fov:62,distance:5,steering:1,controls:true};
-export function loadSettings(){let saved={};try{saved=JSON.parse(localStorage.getItem('little-fifty-settings'))||{};}catch{}const values={...defaults};for(const [key,min,max] of [['fov',50,80],['distance',4,7],['steering',.6,1.5]])if(Number.isFinite(saved[key]))values[key]=Math.max(min,Math.min(max,saved[key]));if(['high','low'].includes(saved.quality))values.quality=saved.quality;if(typeof saved.controls==='boolean')values.controls=saved.controls;return values;}
+const defaults={quality:'high',fov:62,distance:5,steering:1,controls:true,volume:.55};
+export function loadSettings(){let saved={};try{saved=JSON.parse(localStorage.getItem('little-fifty-settings'))||{};}catch{}const values={...defaults};for(const [key,min,max] of [['fov',50,80],['distance',4,7],['steering',.6,1.5],['volume',0,1]])if(Number.isFinite(saved[key]))values[key]=Math.max(min,Math.min(max,saved[key]));if(['high','low'].includes(saved.quality))values.quality=saved.quality;if(typeof saved.controls==='boolean')values.controls=saved.controls;return values;}
 export function setupMenu(settings,{play,change,preview,equip}){
  let selected=loadBikeId(),viewed=selected,detailOpen=false;
  const grid=document.getElementById('bike-grid'),details=document.getElementById('shop-details'),menu=document.getElementById('menu'),back=document.getElementById('shop-back');
@@ -25,7 +25,7 @@ export function setupMenu(settings,{play,change,preview,equip}){
  const show=panel=>{for(const name of ['home','settings','shop'])document.getElementById(name+'-panel').hidden=name!==panel;menu.classList.remove('shop-catalog');if(panel==='shop')showCatalog();else preview(selected);};
  back.onclick=()=>{if(detailOpen){showCatalog();grid.querySelector('[data-bike="'+viewed+'"]').focus({preventScroll:true});}else show('home');};
  document.querySelectorAll('[data-panel]').forEach(button=>button.onclick=()=>show(button.dataset.panel));document.getElementById('home').onclick=e=>{e.preventDefault();show('home');};document.getElementById('play').onclick=play;
- for(const key of Object.keys(defaults)){const input=document.getElementById(key);if(key==='controls')input.checked=settings[key];else input.value=settings[key];const refresh=()=>{const output=document.getElementById(key+'-value');if(output)output.value=settings[key]+(key==='fov'?'°':key==='distance'?' m':'×');};refresh();input.addEventListener('input',()=>{settings[key]=key==='controls'?input.checked:key==='quality'?input.value:Number(input.value);refresh();try{localStorage.setItem('little-fifty-settings',JSON.stringify(settings));}catch{}change();});}
+ for(const key of Object.keys(defaults)){const input=document.getElementById(key);if(key==='controls')input.checked=settings[key];else input.value=settings[key];const refresh=()=>{const output=document.getElementById(key+'-value');if(output)output.value=key==='volume'?Math.round(settings[key]*100)+'%':settings[key]+(key==='fov'?'°':key==='distance'?' m':'×');};refresh();input.addEventListener('input',()=>{settings[key]=key==='controls'?input.checked:key==='quality'?input.value:Number(input.value);refresh();try{localStorage.setItem('little-fifty-settings',JSON.stringify(settings));}catch{}change();});}
  document.getElementById('fullscreen').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen();}catch{}};
  renderBike();return {show};
 }

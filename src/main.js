@@ -1,4 +1,5 @@
-﻿import * as T from 'three';
+import {createAudio} from './audio.js';
+import * as T from 'three';
 import './style.css';
 import {createBike,advanceBike,balancePoint,interpolateBike,STEP} from './physics.js';
 import {createSparks} from './sparks.js';
@@ -8,6 +9,7 @@ import {loadSettings,setupMenu} from './ui.js';
 import {getBike,loadBikeId} from './catalog.js';
 let selectedId=loadBikeId();
 const settings=loadSettings();
+const sound=createAudio();
 const scene=new T.Scene();scene.fog=new T.Fog(0xd2d4b7,110,250);
 scene.add(new T.HemisphereLight(0xc9e5ed,0x6c7040,2));
 const sun=new T.DirectionalLight(0xffdfaa,3.1);sun.position.set(-18,28,-12);sun.castShadow=true;
@@ -33,15 +35,16 @@ const look=new T.Vector3(),desired=new T.Vector3();
 const cameraOffset=new T.Vector3(.9,2.1,-settings.distance);
 const lightOffset=new T.Vector3(-18,28,-17),lightRight=new T.Vector3().crossVectors(new T.Vector3(0,1,0),lightOffset).normalize(),lightUp=new T.Vector3().crossVectors(lightOffset,lightRight).normalize(),shadowCenter=new T.Vector3();
 function applySettings(){
+  sound.setVolume(settings.volume);
   const high=settings.quality==='high';renderer.setPixelRatio(Math.min(devicePixelRatio,high?1.5:1));renderer.shadowMap.enabled=high;
   const size=high?1024:512;
   if(sun.shadow.mapSize.x!==size){sun.shadow.mapSize.set(size,size);sun.shadow.map?.dispose();sun.shadow.map=null;}
   scene.traverse(o=>{if(o.material){for(const m of [].concat(o.material))m.needsUpdate=true;}});
   el['ride-controls'].hidden=!settings.controls;
 }
-function reset(){bike=createBike(selectedId);Object.assign(previous,bike);sparks.clear();keys.clear();remainder=0;last=null;hudTime=0;cameraOffset.set(.9,2.1,-settings.distance);camera.position.copy(cameraOffset);look.set(0,1.05,1);el.crash.hidden=true;}
-function openMenu(){mode='menu';keys.clear();remainder=0;last=null;el.menu.hidden=false;el.hud.hidden=true;document.body.classList.add('in-menu');ui.show('home');document.getElementById('play').innerHTML=started?'JATKA AJOA <span>↗</span>':'LÄHDE AJAMAAN <span>↗</span>';}
-function play(){showBike(selectedId);if(!started){reset();started=true;}mode='ride';Object.assign(previous,bike);keys.clear();last=null;remainder=0;hudTime=0;el.menu.hidden=true;el.hud.hidden=false;document.body.classList.remove('in-menu');const h=bike.heading;cameraOffset.set(-Math.sin(h)*settings.distance+Math.cos(h)*.9,2.1,-Math.cos(h)*settings.distance-Math.sin(h)*.9);camera.position.set(bike.x,0,bike.z).add(cameraOffset);look.set(bike.x,1.1,bike.z+.5);}
+function reset(){sound.quiet();bike=createBike(selectedId);Object.assign(previous,bike);sparks.clear();keys.clear();remainder=0;last=null;hudTime=0;cameraOffset.set(.9,2.1,-settings.distance);camera.position.copy(cameraOffset);look.set(0,1.05,1);el.crash.hidden=true;}
+function openMenu(){sound.quiet();mode='menu';keys.clear();remainder=0;last=null;el.menu.hidden=false;el.hud.hidden=true;document.body.classList.add('in-menu');ui.show('home');document.getElementById('play').innerHTML=started?'JATKA AJOA <span>↗</span>':'LÄHDE AJAMAAN <span>↗</span>';}
+function play(){sound.start();showBike(selectedId);if(!started){reset();started=true;}mode='ride';Object.assign(previous,bike);keys.clear();last=null;remainder=0;hudTime=0;el.menu.hidden=true;el.hud.hidden=false;document.body.classList.remove('in-menu');const h=bike.heading;cameraOffset.set(-Math.sin(h)*settings.distance+Math.cos(h)*.9,2.1,-Math.cos(h)*settings.distance-Math.sin(h)*.9);camera.position.set(bike.x,0,bike.z).add(cameraOffset);look.set(bike.x,1.1,bike.z+.5);}
 const ui=setupMenu(settings,{play,change:applySettings,preview:showBike,equip(id){selectedId=id;showBike(id);reset();}});showBike(selectedId);document.getElementById('menu-button').onclick=openMenu;document.getElementById('reset').onclick=reset;
 const codes=['ArrowDown','ArrowUp','Space','ShiftLeft','ShiftRight','KeyW','KeyS','KeyA','KeyD','KeyR','KeyC'];
 addEventListener('keydown',e=>{
@@ -95,6 +98,7 @@ renderer.setAnimationLoop(time=>{
   }
   const cameraText=cockpit?'1. persoona':'3. persoona';
   if(cameraLabel.textContent!==cameraText)cameraLabel.textContent=cameraText;
+  sound.update(bike,getBike(selectedId),mode==='ride');
   sparks.update(shown,dt,mode==='ride');
   shadow.position.set(shown.x,.018,shown.z+.5);shadow.rotation.z=-shown.heading;
   // Snap the shadow camera in light space to prevent shadows crawling over asphalt.
