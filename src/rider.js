@@ -3,7 +3,7 @@ export function createRider(parent,spec,h){
  const {box,bar,sphere,mesh,material,poseBar,label}=h;
  const white=0xeceee3,dark=0x263136,orange=0xea7248,skin=0xc88c6b,hip=spec.seat-spec.radius+.10;
  const root=new T.Group();root.name='rider';parent.add(root);const body=new T.Group();root.add(body);
- const hips=box(root,[.31,.18,.25],[0,hip-.02,.45],dark,.065);hips.userData.animated=!!spec.scooter;
+ const hips=box(root,[.31,.18,.25],[0,hip-.02,.45],dark,.065);hips.userData.animated=true;
  const torso=mesh(body,new T.CylinderGeometry(.23,.17,.43,8),material(orange),[0,.25,0]);torso.scale.z=.66;
  box(body,[.29,.27,.07],[0,.28,.15],dark,.055);box(body,[.24,.23,.04],[0,.28,-.145],white,.045);
  label(body,'LF',[.17,.07],[0,.29,-.169],Math.PI,'#273236','#eceee3');
@@ -50,7 +50,14 @@ export function createRider(parent,spec,h){
  for(const arm of arms)for(const part of [arm.finger,arm.upper,arm.lower,arm.elbow])part.userData.animated=true;
  for(const leg of legs)for(const part of [leg.thigh,leg.shin,leg.knee])part.userData.animated=true;
  let time=0,oneFoot=0;const shoulder=new T.Vector3(),wrist=new T.Vector3(),releasedHand=new T.Vector3();
- return {root,head,eyes,update(b,dt,grips){
+ return {root,head,eyes,setFirstPerson(enabled){
+  // Keep the animated eye anchor and forearms; hide geometry around the camera.
+  // Inspect the body after batching, since its original meshes may be merged.
+  head.visible=!enabled;hips.visible=!enabled;
+  for(const part of body.children)if(part.isMesh)part.visible=!enabled;
+  for(const arm of arms){arm.upper.visible=!enabled;arm.elbow.visible=!enabled;}
+  for(const leg of legs)for(const part of [leg.thigh,leg.shin,leg.knee,leg.boot])part.visible=!enabled;
+ },update(b,dt,grips){
   time+=dt;const load=Math.min(Math.abs(b.acceleration||0),10),throttle=b.throttle||0,brake=b.brake||0;
   const footTarget=spec.scooter&&!b.crashed?T.MathUtils.smoothstep(b.pitch,.08,.35):0;
   oneFoot+=(footTarget-oneFoot)*(1-Math.exp(-9*dt));

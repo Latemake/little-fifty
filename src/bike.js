@@ -113,7 +113,7 @@ export function createModel(id='rieju'){
  const rider=createRider(chassis,spec,h);let spin=0,detached=false;
  const fallStart=new T.Vector3(),fallRotation=new T.Quaternion(),fallEnd=new T.Vector3(.65,-spec.radius-.25,-1.35),landRotation=new T.Quaternion().setFromEuler(new T.Euler(-Math.PI/2,0,.12)),bounds=new T.Box3();
  h.batch(root);
- return {root,spec,head:rider.head,eyes:rider.eyes,dispose:h.dispose,update(b,dt){
+ return {root,spec,head:rider.head,eyes:rider.eyes,setFirstPerson:rider.setFirstPerson,dispose:h.dispose,update(b,dt){
   root.position.set(b.x,spec.radius,b.z);root.rotation.y=b.heading;pitch.rotation.x=-b.pitch;
   pitch.rotation.z=bikeRoll(b);chassis.position.y=b.suspension;
   // Front hub remains on the ground as the fork compresses. Steering turns the complete fork, wheel and controls.

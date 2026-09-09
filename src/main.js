@@ -91,7 +91,7 @@ renderer.setAnimationLoop(time=>{
   }
   model.update(shown,dt);world.update(shown.z,shown.x);
   const cockpit=mode==='ride'&&firstPerson&&!shown.crashed;
-  model.head.visible=!cockpit;
+  model.setFirstPerson(cockpit);
   camera.near=cockpit?.035:.1;
   if(cockpit){
     model.eyes.getWorldPosition(camera.position);
