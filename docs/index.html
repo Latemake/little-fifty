@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="fi">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#19221e"><link rel="icon" href="./favicon.svg" type="image/svg+xml"><title>Little Fifty — Vapaa tie</title>  <script type="module" crossorigin src="./assets/index-Cn7e69Ic.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-BUK6oM_q.css">
+</head>
+<body class="in-menu">
+  <div id="menu">
+    <nav class="topbar"><a class="wordmark" href="#" id="home">LF<span>↗</span></a><span class="eyebrow">LITTLE FIFTY / VAPAA TIE</span><span class="build">01 — EARLY RIDE</span></nav>
+    <section id="home-panel" class="panel home-panel">
+      <div class="eyebrow orange"><i></i> KAKSI PYÖRÄÄ. YKSI TASAPAINO.</div>
+      <h1>LITTLE<br><span>FIFTY.</span></h1>
+      <p class="intro">Kaasu auki. Keula ylös.<br>Löydä oma tasapainosi.</p>
+      <div class="menu-actions"><button id="play" class="primary">LÄHDE AJAMAAN <span>↗</span></button><button data-panel="settings">ASETUKSET <span>02</span></button><button data-panel="shop">PYÖRÄKAUPPA <span>03</span></button></div>
+    </section>
+    <section id="settings-panel" class="panel sub-panel" hidden>
+      <button class="back" data-panel="home">← TAKAISIN</button><div class="eyebrow orange">TEE AJOSTA OMANLAISESI</div><h2>ASETUKSET<span>.</span></h2>
+      <div class="settings-list">
+        <label>Grafiikka<select id="quality"><option value="high">Korkea</option><option value="low">Kevyt</option></select></label>
+        <label>Näkökenttä <output id="fov-value"></output><input id="fov" type="range" min="50" max="80" step="1"></label>
+        <label>Kameran etäisyys <output id="distance-value"></output><input id="distance" type="range" min="4" max="7" step="0.1"></label>
+        <label>Ohjauksen herkkyys <output id="steering-value"></output><input id="steering" type="range" min="0.6" max="1.5" step="0.1"></label>
+        <label>Näytä näppäinohjeet<input id="controls" type="checkbox"></label>
+      </div><button id="fullscreen" class="secondary">KOKO NÄYTTÖ ↗</button><p class="small">Asetukset tallentuvat tähän selaimeen.</p>
+    </section>
+    <section id="shop-panel" class="panel sub-panel" hidden>
+      <button class="back" id="shop-back">← PÄÄVALIKKO</button><div class="eyebrow orange">LÖYDÄ OMA TUNTUMASI</div><h2>PYÖRÄKAUPPA<span>.</span></h2>
+      <p id="shop-intro" class="small">Kolme erilaista pyörää. Klikkaa kuvaa ja tutustu tarkemmin.</p>
+      <div id="bike-grid" aria-label="Pyörävalikoima"></div>
+      <article id="shop-details" class="bike-card" hidden><div class="card-top"><span class="eyebrow" id="shop-version"></span></div><h3 id="shop-name" tabindex="-1"></h3><p id="shop-description"></p><div class="specs"><div><b id="shop-speed"></b><span>KM/H</span></div><div><b id="shop-torque"></b><span>VÄÄNTÖ / TAKAPYÖRÄ</span></div><div><b id="shop-engine"></b><span>MOOTTORI</span></div></div><button id="equip" class="primary">KÄYTÖSSÄ ✓</button></article>
+      <p class="small">Kaikki pyörät ovat prototyypissä vapaasti käytettävissä. Pyörän vaihtaminen aloittaa uuden ajon.</p>
+    </section>
+    <div class="showcase-label"><span class="eyebrow">OMA PYÖRÄSI</span><strong id="preview-name">Rieju MRT 50cc</strong><span class="small" id="preview-type">SUPERMOTO · 2-TAHTI</span></div>
+    <div class="menu-bottom"><span>VAPAA AJO. EI KIIRETTÄ PERILLE.</span><span>W KAASU &nbsp; ↓ PAINO TAAKSE &nbsp; ↑ PAINO ETEEN</span></div>
+  </div>
+  <div id="hud" hidden>
+    <header class="ride-header"><span class="wordmark">LF<span>↗</span></span><div><span class="eyebrow">VAPAA AJO</span><p id="ride-bike">Rieju MRT 50cc</p></div><button id="menu-button">VALIKKO <kbd>ESC</kbd></button></header>
+    <aside class="telemetry"><span class="eyebrow" id="state">VALMIS AJOON</span><div class="speed"><b id="speed">0</b><small>KM/H</small></div><label>KEULAKULMA <span id="angle">0°</span></label><div class="balance-track"><div id="balance-fill"></div><i id="balance-marker"></i></div><label>TASAPAINOKOHTA <span id="point">60°</span></label><p id="hint"></p></aside>
+    <footer id="ride-controls"><span><kbd>W</kbd> Kaasu <kbd>S</kbd> Takajarru <kbd>A</kbd><kbd>D</kbd> Ohjaus</span><span><kbd>↓</kbd> Taakse <kbd>↑</kbd> Eteen <kbd>R</kbd> Uudelleen</span><span><kbd>C</kbd> Kamera · <span id="camera-mode">3. persoona</span></span></footer>
+    <div id="crash" hidden><span class="eyebrow orange">TASAPAINO KARKASI</span><h2>UUSI YRITYS.</h2><p>Vähän vähemmän kaasua, vähän enemmän tuntumaa.</p><button id="reset" class="primary">TAKAISIN SATULAAN <span>R ↗</span></button></div>
+  </div>
+</body></html>
+
