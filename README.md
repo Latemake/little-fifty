@@ -69,3 +69,8 @@ Press **C** while riding to toggle first-person / third-person. First-person fol
 Pitch now integrates torque in Nm divided by estimated bike/rider inertia in kg m². Gravity uses 9.81 m/s² and the center-of-mass lever arm; angular damping is reduced from 2.6 to 0.35 per second. Closed throttle decays quickly, and the drive moment falls with available motor power and the speed limiter. Rear braking uses a braking moment; the existing spring absorbs front-wheel landings.
 
 Controlled Rieju drops from rest in pitch, at 8 m/s and neutral lean: 30° takes about 0.51 s, 45° about 0.80 s, and 55° about 1.23 s (previously 0.78 / 1.32 / 2.17 s). Falling remains slower near the balance point because gravity's lever arm approaches zero there. Above the point, gravity tips the bike backwards. These are regression measurements of the game, not measured real-bike drop times. Effective center of mass, distributed inertia and the 50cc lift assist remain gameplay estimates.
+
+
+## KuKirin G2
+
+Standing scooter with a grey/orange chassis and its own balance point. The requested game top speed is 53 km/h; the supplied product screenshot lists 45 km/h and 800 W. Mass, wheel torque and lift assistance are arcade estimates. The shop thumbnail is rendered from the game model.

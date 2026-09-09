@@ -1,8 +1,31 @@
 ﻿import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createBike,updateBike,advanceBike,balancePoint,STEP,fenderContact,interpolateBike} from './physics.js';
-import {BIKES} from './catalog.js';
+import {BIKES as ALL_BIKES} from './catalog.js';
+const BIKES=Object.fromEntries(Object.entries(ALL_BIKES).filter(([,spec])=>!spec.scooter));
 const run=(b,input,seconds)=>{for(let i=0;i<seconds/STEP;i++)updateBike(b,input,STEP);};
+test('G2 has a standing balance point, controllable lift and 53 km/h limit',()=>{
+ const b=createBike('g2');run(b,{throttle:true,forward:true},90);
+ assert.ok(Math.abs(b.speed*3.6-53)<.1);assert.equal(b.pitch,0);
+ run(b,{throttle:true,back:true},2);assert.equal(b.pitch,0);
+ run(b,{brake:true,forward:true},4);assert.equal(b.speed,0);
+ const back=createBike('g2'),neutral=createBike('g2');run(back,{throttle:true,back:true},.8);run(neutral,{throttle:true},.8);
+ assert.ok(back.pitch>.08);assert.ok(back.pitch>neutral.pitch);
+ run(back,{brake:true,forward:true},2);assert.equal(back.pitch,0);assert.equal(back.crashed,false);
+ for(const lean of [-1,0,1]){
+  const level=createBike('g2');level.lean=lean;level.pitch=balancePoint(lean,'g2');
+  updateBike(level,{back:lean===1,forward:lean===-1},STEP);assert.ok(Math.abs(level.pitchRate)<1e-12);
+ }
+ const loop=createBike('g2');run(loop,{throttle:true,back:true},8);assert.equal(loop.crashed,true);
+ assert.equal(createBike('g2').crashed,false);
+ const balanced=createBike('g2');balanced.speed=8;balanced.pitch=balancePoint(0,'g2')-.03;
+ for(let i=0;i<120/STEP;i++){
+  const error=balancePoint(0,'g2')-.03-balanced.pitch-.7*balanced.pitchRate;
+  updateBike(balanced,{throttle:error>0,brake:error<-.025},STEP);
+  assert.ok(balanced.pitch>.45&&balanced.pitch<.6);
+ }
+ assert.equal(balanced.crashed,false);
+});
 test('driving, steering and braking',()=>{
  const b=createBike();run(b,{throttle:true,forward:true},5);assert.ok(b.speed>10);assert.equal(b.pitch,0);
  run(b,{throttle:true,left:true,forward:true},1);assert.ok(b.heading>0&&b.x>0);

@@ -1,10 +1,11 @@
 ﻿// Manufacturer references and arcade tuning assumptions are documented in README.md.
 export const BIKES={
+ g2:{id:'g2',name:'KuKirin G2',version:'800 W · peliversio 53 km/h',type:'SÄHKÖPOTKULAUTA',topSpeed:53,wheelTorque:32,torqueLabel:'Kevyt',powerKW:.8,mass:26,wheelbase:.94,radius:.127,seat:1.04,accent:0xf28a20,frame:0x596064,electric:true,scooter:true,description:'Harmaa runko, oranssit yksityiskohdat ja pienet leveät renkaat. Aja seisten ja nosta keula siirtämällä painoa taakse. Pelin huippunopeus on 53 km/h.'},
  rieju:{id:'rieju',name:'Rieju MRT 50cc',version:'MRT 50 SM · vakio',type:'2-TAHTI / SUPERMOTO',topSpeed:45,wheelTorque:110,torqueLabel:'Pehmeä',powerKW:2.5,mass:85,wheelbase:1.405,radius:.30,seat:.85,accent:0xd63432,frame:0x24292e,description:'Punavalkoiset katteet, Minarelli-kaksitahti ja paisuntaputki. Keuliminen vaatii selvän painonsiirron.',electric:false},
  light:{id:'light',name:'Sur-Ron Light Bee X',version:'MY26 · 10 kW · off-road',type:'SÄHKÖ / LIGHTWEIGHT',topSpeed:80,wheelTorque:295,torqueLabel:'295 Nm',powerKW:10,mass:59,wheelbase:1.255,radius:.30,seat:.83,accent:0x69b991,frame:0x282d31,description:'Kapea akkurunko, kevyt alumiinirakenne ja lyhyt satula. Välitön kaasu ja ketterä keuliminen.',electric:true},
  ultra:{id:'ultra',name:'Sur-Ron Ultra Bee',version:'HP X MY26 · 24,5 kW · off-road',type:'SÄHKÖ / PERFORMANCE',topSpeed:95,wheelTorque:520,torqueLabel:'520 Nm',powerKW:24.5,mass:88.5,wheelbase:1.38,radius:.32,seat:.91,accent:0xe7db36,frame:0xa4adb1,description:'Leveä hopearunko, suurempi akku ja täysikokoiset katteet. Voimakas vääntö vaatii tarkkaa kaasukättä.',electric:true},
 };
 export function getBike(id='rieju'){return BIKES[id]||BIKES.rieju;}
 // The same rear tip dimensions drive the visible fender and ground contact.
-export function rearFender(id){const spec=getBike(id);return {reach:id==='light'?.26:id==='ultra'?.31:.30,rootZ:.08,height:spec.seat-spec.radius-.03,width:id==='light'?.13:id==='ultra'?.18:.17,thickness:.016,maxBend:.95};}
+export function rearFender(id){const spec=getBike(id);if(spec.scooter)return {reach:.13,rootZ:.07,height:.19,width:.12,thickness:.012,maxBend:.95};return {reach:id==='light'?.26:id==='ultra'?.31:.30,rootZ:.08,height:spec.seat-spec.radius-.03,width:id==='light'?.13:id==='ultra'?.18:.17,thickness:.016,maxBend:.95};}
 export function loadBikeId(){try{return getBike(localStorage.getItem('little-fifty-bike')).id;}catch{return 'rieju';}}

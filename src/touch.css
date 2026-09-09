@@ -1,4 +1,7 @@
 #touch-controls{display:none}
+#bike-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media(max-width:1000px){#bike-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:640px){#bike-grid{grid-template-columns:1fr}}
 .touch-device>canvas{position:fixed;inset:0}
 .touch-device #hud,.touch-device #menu{position:fixed}
 .touch-device #touch-controls{display:block;position:absolute;inset:0;pointer-events:none;user-select:none;-webkit-user-select:none}

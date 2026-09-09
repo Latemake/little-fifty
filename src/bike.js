@@ -10,19 +10,20 @@ export function createModel(id='rieju'){
  const steering=new T.Group();steering.name='front-steering';steering.position.set(0,.59,wb-.20);chassis.add(steering);
  function wheel(parent,z,y=0){
   const group=new T.Group();parent.add(group);group.position.set(0,y,z);
-  const radius=spec.radius,thickness=id==='light'?.053:.069;
+  const radius=spec.radius,thickness=spec.scooter?.032:id==='light'?.053:.069;
   const tire=mesh(group,new T.TorusGeometry(radius-thickness,thickness,10,28),material(0x171c1d));tire.rotation.y=Math.PI/2;
-  const rim=mesh(group,new T.TorusGeometry(radius-.09,.019,6,28),material(id==='rieju'?silver:dark,.65,.32));rim.rotation.y=Math.PI/2;
+  const rim=mesh(group,new T.TorusGeometry(radius-(spec.scooter?.045:.09),.019,6,28),material(id==='rieju'?silver:dark,.65,.32));rim.rotation.y=Math.PI/2;
   const spokeGeometry=new T.CylinderGeometry(.005,.005,radius-.09,5),spokes=new T.InstancedMesh(spokeGeometry,material(silver,.7,.3),20),dummy=new T.Object3D();
   for(let i=0;i<20;i++){const angle=i*Math.PI/10;dummy.position.set(0,Math.cos(angle)*(radius-.09)*.5,Math.sin(angle)*(radius-.09)*.5);dummy.rotation.x=angle;dummy.updateMatrix();spokes.setMatrixAt(i,dummy.matrix);}group.add(spokes);
   // Register instanced geometry for cleanup when switching bikes.
   h.trackInstances(spokes);
-  for(const x of [-.07,.07]){const disc=mesh(group,new T.CylinderGeometry(.115,.115,.012,24),material(silver,.75,.35),[x,0,0]);disc.rotation.z=Math.PI/2;}
+  for(const x of [-.07,.07]){const r=spec.scooter?.073:.115;const disc=mesh(group,new T.CylinderGeometry(r,r,.012,24),material(silver,.75,.35),[x,0,0]);disc.rotation.z=Math.PI/2;}
   bar(group,[-.12,0,0],[.12,0,0],.038,accent,.3);
   if(spec.electric){const treadGeo=new T.BoxGeometry(.085,.018,.043),tread=new T.InstancedMesh(treadGeo,material(0x171c1d),32);for(let i=0;i<32;i++){const a=i*Math.PI/16;dummy.position.set(0,Math.cos(a)*radius,Math.sin(a)*radius);dummy.rotation.x=a;dummy.updateMatrix();tread.setMatrixAt(i,dummy.matrix);}group.add(tread);h.trackInstances(tread);}
   return group;
  }
  const rear=wheel(pitch,0),front=wheel(steering,.20,-.59);
+ if(!spec.scooter){
  for(const side of [-1,1]){
   const x=side*(id==='ultra'?.155:.12);
   bar(chassis,[x,0,0],[x,.19,.60],id==='light'?.034:.045,spec.frame,.6);
@@ -41,6 +42,32 @@ export function createModel(id='rieju'){
  box(chassis,[id==='light'?.22:.29,.075,id==='light'?.49:.75],[0,seat+.018,id==='light'?.35:.42],dark,.035);
  for(let i=0;i<6;i++)box(chassis,[id==='light'?.205:.28,.008,.018],[0,seat+.059,.20+i*.065],0x3f4644,.003);
  const fender=box(steering,[id==='light'?.16:.25,.035,spec.electric?.44:.56],[0,-.22,.29],id==='rieju'?accent:dark,.017);fender.rotation.x=-.05;
+ }else{
+  // Battery deck, twin swingarms and tall folding stem; no seat or motorcycle frame.
+  box(chassis,[.22,.10,.58],[0,.06,.46],spec.frame,.015);
+  box(chassis,[.21,.012,.55],[0,.117,.46],dark,.006);
+  for(let i=0;i<9;i++)box(chassis,[.19,.005,.009],[0,.126,.23+i*.055],0x42494a,.002);
+  for(const side of [-1,1]){
+   bar(chassis,[side*.09,0,0],[side*.09,.075,.26],.025,spec.frame,.4);
+   bar(chassis,[side*.094,.015,.04],[side*.094,.06,.21],.019,accent);
+   label(chassis,'G2',[.30,.065],[side*.119,.06,.47],side*Math.PI/2,'#ff971e','#596064');
+   bar(steering,[side*.082,-.59,.20],[side*.082,-.40,.03],.025,spec.frame,.5);
+   box(steering,[.015,.055,.10],[side*.109,-.535,.145],accent,.004);
+  }
+  bar(chassis,[0,.09,.74],[0,.32,.88],.05,spec.frame,.4);
+  bar(steering,[0,-.29,.14],[0,seat+.23-.59,-.01],.031,spec.frame,.5);
+  box(steering,[.083,.17,.065],[0,-.20,.125],dark,.012);
+  label(steering,'KUKIRIN G2',[.055,.39],[0,.13,.066],0,'#ff971e','#30383a');
+  bar(steering,[.045,-.20,.14],[.045,seat+.14-.59,.04],.007,dark);
+  box(steering,[.105,.025,.19],[0,-.435,.22],dark,.009);
+  const heel=box(chassis,[.18,.027,.18],[0,.18,.14],dark,.009);heel.rotation.x=.28;
+  box(chassis,[.11,.02,.018],[0,.21,.055],0xe84636,.004);
+  for(const z of [.16,.83]){
+   bar(chassis,[0,.06,z-.03],[0,.17,z+.04],.022,silver,.4);
+   for(let j=0;j<5;j++){const coil=mesh(chassis,new T.TorusGeometry(.029,.006,5,10),material(dark),[0,.08+j*.017,z+j*.009]);coil.rotation.x=Math.PI/2;}
+  }
+  const hub=mesh(rear,new T.CylinderGeometry(.076,.076,.09,18),material(dark,.4));hub.rotation.z=Math.PI/2;
+ }
  const tail=rearFender(id);
  const tailLength=tail.reach+tail.rootZ,tailRoot=new T.Group();tailRoot.name='rear-fender';tailRoot.position.set(0,tail.height,tail.rootZ);chassis.add(tailRoot);
  const tailGeometry=new T.BoxGeometry(tail.width,tail.thickness,tailLength,1,1,14);tailGeometry.translate(0,0,-tailLength/2);
@@ -65,7 +92,7 @@ export function createModel(id='rieju'){
   bar(chassis,[.24,seat-.09,.24],[.24,seat-.055,-.12],.068,silver,.75);
   box(steering,[.27,.27,.065],[0,.01,.07],white,.04);
   label(steering,'MRT 50',[.22,.06],[0,-.06,.106]);
- }else{
+ }else if(!spec.scooter){
   const large=id==='ultra';
   const battery=box(chassis,[large?.36:.23,large?.40:.35,large?.45:.29],[0,seat-.21,large?.69:.65],dark,.04);battery.rotation.x=-.15;
   box(chassis,[large?.31:.21,.028,.25],[0,seat+.004,.76],dark,.014);

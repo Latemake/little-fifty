@@ -24,11 +24,12 @@ export function fenderContact(b,out={},bend=b.fenderBend){
   out.y=spec.radius+y*Math.cos(roll)*Math.cos(b.pitch)+z*Math.sin(b.pitch);
   out.z=b.z-localX*Math.sin(b.heading)+localZ*Math.cos(b.heading);return out;
 }
-export function centerOfMass(lean) {
+export function centerOfMass(lean,id) {
+  if(getBike(id).scooter)return {forward:.55-.2*lean,height:.9};
   return { forward: .95 - .25 * lean, height: .55 };
 }
-export function balancePoint(lean) {
-  const mass = centerOfMass(lean);
+export function balancePoint(lean,id) {
+  const mass = centerOfMass(lean,id);
   return Math.atan2(mass.forward, mass.height);
 }
 export function createBike(id = 'rieju') {
@@ -65,7 +66,7 @@ export function updateBike(b, input, dt) {
     // Forward input wins if both lean directions are held.
     const leanTarget = input.forward ? -1 : input.back ? 1 : 0;
     b.lean += (leanTarget - b.lean) * (1 - Math.exp(-8 * dt));
-    const mass = centerOfMass(b.lean);
+    const mass = centerOfMass(b.lean,b.id);
     // Moments in Nm about the rear axle, divided by kg*m² inertia.
     // Effective COM/distributed inertia are gameplay estimates; g is Earth gravity.
     const lever=mass.forward*Math.cos(b.pitch)-mass.height*Math.sin(b.pitch);
@@ -76,7 +77,7 @@ export function updateBike(b, input, dt) {
     // assist for the stock 50cc; body position still determines the balance point.
     const availableTorque=force*spec.radius;
     const torqueRatio=(availableTorque/totalMass)/(110/160);
-    const liftPerMass=GRAVITY*.95*(.93+.17*Math.exp(-b.speed/4))*Math.pow(torqueRatio,.28);
+    const liftPerMass=spec.scooter?force/totalMass*mass.height*(1.4+Math.max(0,b.lean)*.5):GRAVITY*.95*(.93+.17*Math.exp(-b.speed/4))*Math.pow(torqueRatio,.28);
     const brakeHold=oldSpeed<.1?Math.max(0,1-brakeDeceleration/Math.max(driveAcceleration,.001)):1;
     const driveTorque=totalMass*b.throttle*liftPerMass*speedLimiter*brakeHold*(input.forward?.15:1);
     const brakeTorque=totalMass*brakeDeceleration*(mass.forward*Math.sin(b.pitch)+mass.height*Math.cos(b.pitch));

@@ -6,7 +6,7 @@ export function setupMenu(settings,{play,change,preview,equip}){
  const grid=document.getElementById('bike-grid'),details=document.getElementById('shop-details'),menu=document.getElementById('menu'),back=document.getElementById('shop-back');
  for(const spec of Object.values(BIKES)){
   const button=document.createElement('button');button.className='bike-tile';button.dataset.bike=spec.id;button.setAttribute('aria-label',spec.name+' — avaa tiedot');button.setAttribute('aria-controls','shop-details');button.setAttribute('aria-expanded','false');
-  const photo=document.createElement('img');photo.src=import.meta.env.BASE_URL+'bikes/'+spec.id+'.png';photo.alt=spec.name+(spec.id==='rieju'?' — pelimalli':' — tuotekuva');photo.width=800;photo.height=500;photo.decoding='async';
+  const photo=document.createElement('img');photo.src=import.meta.env.BASE_URL+'bikes/'+spec.id+'.png';photo.alt=spec.name+((spec.id==='rieju'||spec.scooter)?' — pelimalli':' — tuotekuva');photo.width=800;photo.height=500;photo.decoding='async';
   const visual=document.createElement('span');visual.className='bike-tile-photo';visual.append(photo);
   const info=document.createElement('span');info.className='bike-tile-info';
   const type=document.createElement('span');type.className='eyebrow';type.textContent=spec.type;

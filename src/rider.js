@@ -3,7 +3,7 @@ export function createRider(parent,spec,h){
  const {box,bar,sphere,mesh,material,poseBar,label}=h;
  const white=0xeceee3,dark=0x263136,orange=0xea7248,skin=0xc88c6b,hip=spec.seat-spec.radius+.10;
  const root=new T.Group();root.name='rider';parent.add(root);const body=new T.Group();root.add(body);
- box(root,[.31,.18,.25],[0,hip-.02,.45],dark,.065);
+ const hips=box(root,[.31,.18,.25],[0,hip-.02,.45],dark,.065);hips.userData.animated=!!spec.scooter;
  const torso=mesh(body,new T.CylinderGeometry(.23,.17,.43,8),material(orange),[0,.25,0]);torso.scale.z=.66;
  box(body,[.29,.27,.07],[0,.28,.15],dark,.055);box(body,[.24,.23,.04],[0,.28,-.145],white,.045);
  label(body,'LF',[.17,.07],[0,.29,-.169],Math.PI,'#273236','#eceee3');
@@ -53,7 +53,8 @@ export function createRider(parent,spec,h){
  return {root,head,eyes,update(b,dt,grips){
   time+=dt;const load=Math.min(Math.abs(b.acceleration||0),10),throttle=b.throttle||0,brake=b.brake||0;
   const bounce=(spec.electric?0:Math.sin(time*(18+throttle*25))*.002)*(b.speed>0||throttle?1:.35);
-  body.position.set(0,hip-.01-load*.003+bounce,.45-b.lean*.075);
+  body.position.set(0,hip-.01-load*.003+bounce,.45-b.lean*(spec.scooter?.15:.075));
+  if(spec.scooter)hips.position.set(0,body.position.y-.02,body.position.z);
   body.rotation.set(-b.lean*.32+throttle*.055-brake*.11,0,-b.steer*.035);
   head.rotation.set(Math.min(b.pitch,.9)*.10, b.steer*.14,0);
   body.updateMatrix();
@@ -68,8 +69,9 @@ export function createRider(parent,spec,h){
   }
   for(const leg of legs){
    const release=b.crashed?Math.min(1,b.crashTime*3):0;
-   const knee=[leg.side*(.23+.12*release),hip-.24,.73-b.lean*.025-.14*release];const foot=[leg.side*(.23+.20*release),.10+.12*release,.60-.45*release];
-   poseBar(leg.thigh,[leg.side*.14,hip-.01,.45],knee);poseBar(leg.shin,knee,foot);leg.knee.position.set(...knee);leg.boot.position.set(...foot);leg.boot.rotation.x=(!spec.electric&&leg.side===-1)?brake*.18:0;
+   const knee=spec.scooter?[leg.side*(.09+.14*release),hip-.39,.50-b.lean*.09]:[leg.side*(.23+.12*release),hip-.24,.73-b.lean*.025-.14*release];
+   const foot=spec.scooter?[leg.side*(.06+.2*release),.18+.12*release,(leg.side===-1?.57:.29)-.35*release]:[leg.side*(.23+.20*release),.10+.12*release,.60-.45*release];
+   poseBar(leg.thigh,[leg.side*.14,hip-.01,.45-(spec.scooter?b.lean*.15:0)],knee);poseBar(leg.shin,knee,foot);leg.knee.position.set(...knee);leg.boot.position.set(...foot);leg.boot.rotation.x=(!spec.electric&&leg.side===-1)?brake*.18:0;
   }
  }};
 }

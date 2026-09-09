@@ -77,7 +77,7 @@ renderer.setAnimationLoop(time=>{
     camera.fov+=(rideFov-camera.fov)*(1-Math.exp(-4*dt));
     hudTime-=dt;
     if(hudTime<=0){hudTime=.1;
-    const angle=bike.pitch*180/Math.PI,point=balancePoint(bike.lean)*180/Math.PI;
+    const angle=bike.pitch*180/Math.PI,point=balancePoint(bike.lean,bike.id)*180/Math.PI;
     el.speed.textContent=Math.round(bike.speed*3.6);el.angle.textContent=Math.round(angle)+'°';el.point.textContent=Math.round(point)+'°';
     el['balance-fill'].style.width=Math.min(100,angle)+'%';el['balance-marker'].style.left=point+'%';
     el.state.textContent=bike.crashed?'YLIKEULIMINEN':bike.fenderBroken?'TAKAKATE POIKKI':bike.scraping?'MUOVIKATE TAIPUU':Math.abs(angle-point)<4?'TASAPAINOSSA':angle>10?'YHDELLÄ PYÖRÄLLÄ':bike.speed>1?'VAPAA AJO':'VALMIS AJOON';
