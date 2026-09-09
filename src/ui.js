@@ -1,6 +1,6 @@
 ﻿import {BIKES,getBike,loadBikeId} from './catalog.js';
 const defaults={quality:'high',fov:62,distance:5,steering:1,controls:true,volume:.55};
-export function loadSettings(){let saved={};try{saved=JSON.parse(localStorage.getItem('little-fifty-settings'))||{};}catch{}const values={...defaults};for(const [key,min,max] of [['fov',50,80],['distance',4,7],['steering',.6,1.5],['volume',0,1]])if(Number.isFinite(saved[key]))values[key]=Math.max(min,Math.min(max,saved[key]));if(['high','low'].includes(saved.quality))values.quality=saved.quality;if(typeof saved.controls==='boolean')values.controls=saved.controls;return values;}
+export function loadSettings(){let saved={};try{saved=JSON.parse(localStorage.getItem('little-fifty-settings'))||{};}catch{}const values={...defaults};if(matchMedia("(pointer: coarse)").matches)values.quality="low";for(const [key,min,max] of [['fov',50,80],['distance',4,7],['steering',.6,1.5],['volume',0,1]])if(Number.isFinite(saved[key]))values[key]=Math.max(min,Math.min(max,saved[key]));if(['high','low'].includes(saved.quality))values.quality=saved.quality;if(typeof saved.controls==='boolean')values.controls=saved.controls;return values;}
 export function setupMenu(settings,{play,change,preview,equip}){
  let selected=loadBikeId(),viewed=selected,detailOpen=false;
  const grid=document.getElementById('bike-grid'),details=document.getElementById('shop-details'),menu=document.getElementById('menu'),back=document.getElementById('shop-back');

@@ -1,6 +1,8 @@
+import {createTouchControls} from './touch.js';
 import {createAudio} from './audio.js';
 import * as T from 'three';
 import './style.css';
+import './touch.css';
 import {createBike,advanceBike,balancePoint,interpolateBike,STEP} from './physics.js';
 import {createSparks} from './sparks.js';
 import {createModel} from './bike.js';
@@ -22,6 +24,7 @@ const shadow=new T.Mesh(new T.CircleGeometry(.8,24),new T.MeshBasicMaterial({col
 const keys=new Set();let bike=createBike(selectedId),remainder=0,last=null,mode='menu',started=false,menuTime=0;
 const previous={...bike},rendered={...bike};let hudTime=0;
 let firstPerson=false;
+const touch=createTouchControls({active:()=>mode==='ride',camera:()=>{firstPerson=!firstPerson;},reset:()=>reset()});
 const cameraLabel=document.getElementById('camera-mode');
 let preview=createBike(selectedId);
 function showBike(id){
@@ -42,9 +45,9 @@ function applySettings(){
   scene.traverse(o=>{if(o.material){for(const m of [].concat(o.material))m.needsUpdate=true;}});
   el['ride-controls'].hidden=!settings.controls;
 }
-function reset(){sound.quiet();bike=createBike(selectedId);Object.assign(previous,bike);sparks.clear();keys.clear();remainder=0;last=null;hudTime=0;cameraOffset.set(.9,2.1,-settings.distance);camera.position.copy(cameraOffset);look.set(0,1.05,1);el.crash.hidden=true;}
-function openMenu(){sound.quiet();mode='menu';keys.clear();remainder=0;last=null;el.menu.hidden=false;el.hud.hidden=true;document.body.classList.add('in-menu');ui.show('home');document.getElementById('play').innerHTML=started?'JATKA AJOA <span>↗</span>':'LÄHDE AJAMAAN <span>↗</span>';}
-function play(){sound.start();showBike(selectedId);if(!started){reset();started=true;}mode='ride';Object.assign(previous,bike);keys.clear();last=null;remainder=0;hudTime=0;el.menu.hidden=true;el.hud.hidden=false;document.body.classList.remove('in-menu');const h=bike.heading;cameraOffset.set(-Math.sin(h)*settings.distance+Math.cos(h)*.9,2.1,-Math.cos(h)*settings.distance-Math.sin(h)*.9);camera.position.set(bike.x,0,bike.z).add(cameraOffset);look.set(bike.x,1.1,bike.z+.5);}
+function reset(){sound.quiet();bike=createBike(selectedId);Object.assign(previous,bike);sparks.clear();keys.clear();touch.clear();remainder=0;last=null;hudTime=0;cameraOffset.set(.9,2.1,-settings.distance);camera.position.copy(cameraOffset);look.set(0,1.05,1);el.crash.hidden=true;}
+function openMenu(){sound.quiet();mode='menu';keys.clear();touch.clear();remainder=0;last=null;el.menu.hidden=false;el.hud.hidden=true;document.body.classList.add('in-menu');ui.show('home');document.getElementById('play').innerHTML=started?'JATKA AJOA <span>↗</span>':'LÄHDE AJAMAAN <span>↗</span>';}
+function play(){sound.start();showBike(selectedId);if(!started){reset();started=true;}mode='ride';Object.assign(previous,bike);keys.clear();touch.clear();last=null;remainder=0;hudTime=0;el.menu.hidden=true;el.hud.hidden=false;document.body.classList.remove('in-menu');const h=bike.heading;cameraOffset.set(-Math.sin(h)*settings.distance+Math.cos(h)*.9,2.1,-Math.cos(h)*settings.distance-Math.sin(h)*.9);camera.position.set(bike.x,0,bike.z).add(cameraOffset);look.set(bike.x,1.1,bike.z+.5);}
 const ui=setupMenu(settings,{play,change:applySettings,preview:showBike,equip(id){selectedId=id;showBike(id);reset();}});showBike(selectedId);document.getElementById('menu-button').onclick=openMenu;document.getElementById('reset').onclick=reset;
 const codes=['ArrowDown','ArrowUp','Space','ShiftLeft','ShiftRight','KeyW','KeyS','KeyA','KeyD','KeyR','KeyC'];
 addEventListener('keydown',e=>{
@@ -53,14 +56,14 @@ addEventListener('keydown',e=>{
   if(e.code==='KeyC'&&!e.repeat)firstPerson=!firstPerson;
 });
 addEventListener('keyup',e=>keys.delete(e.code));
-addEventListener('blur',()=>{keys.clear();if(mode==='ride')openMenu();});
-document.addEventListener('visibilitychange',()=>{keys.clear();last=null;remainder=0;if(document.hidden&&mode==='ride')openMenu();});
+addEventListener('blur',()=>{keys.clear();touch.clear();if(mode==='ride')openMenu();});
+document.addEventListener('visibilitychange',()=>{keys.clear();touch.clear();last=null;remainder=0;if(document.hidden&&mode==='ride')openMenu();});
 function resize(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);}addEventListener('resize',resize);applySettings();resize();reset();
 renderer.setAnimationLoop(time=>{
   const dt=last===null?0:Math.min((time-last)/1000,.25);last=time;
   let shown=bike;
   if(mode==='ride'){
-    const input={throttle:keys.has('KeyW'),brake:keys.has('KeyS'),left:keys.has('KeyA'),right:keys.has('KeyD'),back:keys.has('ArrowDown')||keys.has('Space'),forward:keys.has('ArrowUp')||keys.has('ShiftLeft')||keys.has('ShiftRight'),steeringSensitivity:settings.steering};
+    const input={throttle:touch.state.throttle||keys.has('KeyW'),brake:touch.state.brake||keys.has('KeyS'),left:keys.has('KeyA')?1:touch.state.left,right:keys.has('KeyD')?1:touch.state.right,back:touch.state.back||keys.has('ArrowDown')||keys.has('Space'),forward:touch.state.forward||keys.has('ArrowUp')||keys.has('ShiftLeft')||keys.has('ShiftRight'),steeringSensitivity:settings.steering};
     remainder=advanceBike(bike,input,dt,remainder,previous);
     shown=interpolateBike(previous,bike,remainder/STEP,rendered);
     const pace=T.MathUtils.smoothstep(shown.speed,0,22);
