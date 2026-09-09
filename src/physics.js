@@ -77,9 +77,12 @@ export function updateBike(b, input, dt) {
     // assist for the stock 50cc; body position still determines the balance point.
     const availableTorque=force*spec.radius;
     const torqueRatio=(availableTorque/totalMass)/(110/160);
-    const liftPerMass=spec.scooter?force/totalMass*mass.height*(1.4+Math.max(0,b.lean)*.5):GRAVITY*.95*(.93+.17*Math.exp(-b.speed/4))*Math.pow(torqueRatio,.28);
+    // Scooter pull-up assist stays usable at riding speed. Longitudinal drive
+    // still uses the 800 W power curve; this only assists the pitch moment.
+    const liftPerMass=spec.scooter?(spec.wheelTorque/spec.radius)/totalMass*mass.height*(1.4+Math.max(0,b.lean)*.5):GRAVITY*.95*(.93+.17*Math.exp(-b.speed/4))*Math.pow(torqueRatio,.28);
     const brakeHold=oldSpeed<.1?Math.max(0,1-brakeDeceleration/Math.max(driveAcceleration,.001)):1;
-    const driveTorque=totalMass*b.throttle*liftPerMass*speedLimiter*brakeHold*(input.forward?.15:1);
+    const liftLimiter=spec.scooter?Math.pow(speedLimiter,.45):speedLimiter;
+    const driveTorque=totalMass*b.throttle*liftPerMass*liftLimiter*brakeHold*(input.forward?.15:1);
     const brakeTorque=totalMass*brakeDeceleration*(mass.forward*Math.sin(b.pitch)+mass.height*Math.cos(b.pitch));
     // Small damping removes oscillation without making a falling front float.
     b.pitchRate+=((gravityTorque+driveTorque-brakeTorque)/inertia-.35*b.pitchRate)*dt;

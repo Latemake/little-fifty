@@ -31,6 +31,14 @@ test('driving, steering and braking',()=>{
  run(b,{throttle:true,left:true,forward:true},1);assert.ok(b.heading>0&&b.x>0);
  run(b,{brake:true},4);assert.equal(b.speed,0);
 });
+test('G2 lifts from riding speed with backward lean and remains recoverable',()=>{
+ for(const kmh of [10,20,30,40,45]){
+  const b=createBike('g2');b.speed=kmh/3.6;
+  run(b,{throttle:true,back:true},.9);assert.ok(b.pitch>.08,`${kmh} km/h lift`);assert.equal(b.crashed,false);
+  run(b,{brake:true,forward:true},2);assert.equal(b.pitch,0);assert.equal(b.crashed,false);
+  const forward=createBike('g2');forward.speed=kmh/3.6;run(forward,{throttle:true,forward:true},2);assert.equal(forward.pitch,0);
+ }
+});
 test('W lifts slightly; backward lean makes it easier and can cause a crash',()=>{
  const neutral=createBike(),back=createBike();run(neutral,{throttle:true},1);run(back,{throttle:true,back:true},1);
  assert.ok(neutral.pitch>0);assert.ok(back.pitch>neutral.pitch*4);
